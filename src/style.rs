@@ -10,6 +10,7 @@ pub struct Style {
     pub stroke_width: Option<f32>,
     pub stroke_opacity: Option<f32>,
     pub radius: f32,
+    pub css_classes: Option<String>
 }
 
 impl Default for Style {
@@ -22,6 +23,7 @@ impl Default for Style {
             stroke_width: None,
             stroke_opacity: None,
             radius: 1.0,
+            css_classes: None,
         }
     }
 }
@@ -45,6 +47,9 @@ impl Display for Style {
         }
         if let Some(stroke_opacity) = self.stroke_opacity {
             write!(fmt, r#" stroke-opacity="{}""#, stroke_opacity)?;
+        }
+        if let Some(css_classes) = self.css_classes.clone() {
+            write!(fmt, r#" class="{}""#, css_classes)?;
         }
         Ok(())
     }

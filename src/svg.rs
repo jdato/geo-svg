@@ -37,6 +37,14 @@ impl<'a> Svg<'a> {
         self
     }
 
+    pub fn with_css_classes(mut self, css_classes: String) -> Self {
+        self.style.css_classes = Some(css_classes.clone());
+        for sibling in &mut self.siblings {
+            *sibling = sibling.clone().with_css_classes(css_classes.clone());
+        }
+        self
+    }
+
     pub fn with_opacity(mut self, opacity: f32) -> Self {
         self.style.opacity = Some(opacity);
         for sibling in &mut self.siblings {
