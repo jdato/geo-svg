@@ -10,6 +10,7 @@ impl<T: ToSvgStr> ToSvg for T {
             items: vec![self],
             siblings: vec![],
             viewbox: ViewBox::default(),
+            custom_viewbox: None,
             style: Style::default(),
         }
     }

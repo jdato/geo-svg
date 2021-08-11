@@ -2,6 +2,13 @@ use crate::Color;
 use std::fmt::{Display, Formatter, Result};
 
 #[derive(Debug, Clone, PartialEq)]
+pub enum PointType {
+    Circle,
+    Symbol,
+    Text,
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct Style {
     pub opacity: Option<f32>,
     pub fill: Option<Color>,
@@ -10,7 +17,9 @@ pub struct Style {
     pub stroke_width: Option<f32>,
     pub stroke_opacity: Option<f32>,
     pub radius: f32,
-    pub css_classes: Option<String>
+    pub css_classes: Option<String>,
+    pub id: Option<String>,
+    pub point_type: Option<PointType>,
 }
 
 impl Default for Style {
@@ -24,6 +33,8 @@ impl Default for Style {
             stroke_opacity: None,
             radius: 1.0,
             css_classes: None,
+            id: None,
+            point_type: None,
         }
     }
 }
@@ -50,6 +61,9 @@ impl Display for Style {
         }
         if let Some(css_classes) = self.css_classes.clone() {
             write!(fmt, r#" class="{}""#, css_classes)?;
+        }
+        if let Some(id) = self.id.clone() {
+            write!(fmt, r#" id="{}""#, id)?;
         }
         Ok(())
     }

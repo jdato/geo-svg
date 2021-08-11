@@ -7,6 +7,7 @@ pub struct Svg<'a> {
     pub siblings: Vec<Svg<'a>>,
     pub viewbox: ViewBox,
     pub style: Style,
+    pub custom_viewbox: Option<ViewBox>,
 }
 
 impl<'a> Svg<'a> {
@@ -41,6 +42,14 @@ impl<'a> Svg<'a> {
         self.style.css_classes = Some(css_classes.clone());
         for sibling in &mut self.siblings {
             *sibling = sibling.clone().with_css_classes(css_classes.clone());
+        }
+        self
+    }
+    
+    pub fn with_id(mut self, id: String) -> Self {
+        self.style.id = Some(id.clone());
+        for sibling in &mut self.siblings {
+            *sibling = sibling.clone().with_id(id.clone());
         }
         self
     }
@@ -101,6 +110,11 @@ impl<'a> Svg<'a> {
         self
     }
 
+    pub fn with_custom_viewbox(mut self, min_x: f32, min_y: f32, max_x: f32, max_y: f32) -> Self {
+        self.custom_viewbox = Some(ViewBox::new(min_x, min_y, max_x, max_y));
+        self
+    }
+
     pub fn svg_str(&self) -> String {
         self.items
             .iter()
@@ -122,7 +136,7 @@ impl<'a> Svg<'a> {
 
 impl<'a> Display for Svg<'a> {
     fn fmt(&self, fmt: &mut Formatter) -> Result {
-        let viewbox = self.viewbox();
+        let viewbox = self.custom_viewbox.unwrap_or(self.viewbox());
         write!(
             fmt,
             r#"<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" viewBox="{x} {y} {w} {h}">{content}</svg>"#,
