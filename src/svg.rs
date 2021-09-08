@@ -1,4 +1,4 @@
-use crate::{Color, Style, ToSvgStr, ViewBox};
+use crate::{Color, PointType, Style, ToSvgStr, ViewBox};
 use std::fmt::{Display, Formatter, Result};
 
 #[derive(Clone)]
@@ -43,6 +43,22 @@ impl<'a> Svg<'a> {
         for sibling in &mut self.siblings {
             *sibling = sibling.clone().with_css_classes(css_classes.clone());
         }
+        self
+    }
+    
+    pub fn with_text(mut self, text: String) -> Self {
+        self.style.text = Some(text.clone());
+        self
+    }
+
+    pub fn with_icon_svg_path(mut self, path: &str, height: i16, width: i16) -> Self {
+        self.style.icon_svg_path = Some(path.into());
+        self.style.icon_svg_dimensions = Some((height, width));
+        self
+    }
+    
+    pub fn with_point_type(mut self, point_type: Option<PointType>) -> Self {
+        self.style.point_type = point_type;
         self
     }
     

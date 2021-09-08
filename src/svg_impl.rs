@@ -1,4 +1,4 @@
-use crate::{Style, ToSvgStr, ViewBox};
+use crate::{PointType, Style, ToSvgStr, ViewBox};
 use geo_types::{
     CoordNum, Coordinate, Geometry, GeometryCollection, Line, LineString, MultiLineString,
     MultiPoint, MultiPolygon, Point, Polygon, Rect, Triangle,
@@ -17,13 +17,46 @@ impl<T: CoordNum> ToSvgStr for Coordinate<T> {
 
 impl<T: CoordNum> ToSvgStr for Point<T> {
     fn to_svg_str(&self, style: &Style) -> String {
-        format!(
-            r#"<circle cx="{x:?}" cy="{y:?}" r="{radius}"{style}/>"#,
-            x = self.x(),
-            y = self.y(),
-            radius = style.radius,
-            style = style,
-        )
+        if let Some(point_type) = style.point_type.clone() {
+            match point_type {
+            PointType::Text => format!(
+                r#"<text x="{x:?}" y="{y:?}" {style}>{text}</text>"#,
+                x = self.x(),
+                y = self.y(),
+                text = style.text.clone().unwrap_or("".into()),
+                style = style,
+            ),
+            PointType::Poi => {
+                let (height, width) = style.icon_svg_dimensions.unwrap_or((0,0));
+                
+                format!(
+                    r#"<svg x="{x:?}" y="{y:?}" width="{w}" height="{h}" viewBox="0 0 22 20" {style}>{path}</svg>"#,
+                    style = style,
+                    path = style.icon_svg_path.clone().unwrap_or("".into()),
+                    w = width,
+                    h = height,
+                    x = self.x(),
+                    y = self.y(),
+                )
+            }
+            PointType::Symbol |
+            PointType::Circle => format!(
+                r#"<circle cx="{x:?}" cy="{y:?}" r="{radius}"{style}/>"#,
+                x = self.x(),
+                y = self.y(),
+                radius = style.radius,
+                style = style,
+            )
+            }
+        } else {
+            format!(
+                r#"<circle alt="point_type_none" cx="{x:?}" cy="{y:?}" r="{radius}"{style}/>"#,
+                x = self.x(),
+                y = self.y(),
+                radius = style.radius,
+                style = style,
+            )
+        }
     }
 
     fn viewbox(&self, style: &Style) -> ViewBox {

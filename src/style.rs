@@ -6,6 +6,7 @@ pub enum PointType {
     Circle,
     Symbol,
     Text,
+    Poi,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -20,6 +21,9 @@ pub struct Style {
     pub css_classes: Option<String>,
     pub id: Option<String>,
     pub point_type: Option<PointType>,
+    pub icon_svg_path: Option<String>,
+    pub icon_svg_dimensions: Option<(i16, i16)>, //height, width
+    pub text: Option<String>,
 }
 
 impl Default for Style {
@@ -35,6 +39,9 @@ impl Default for Style {
             css_classes: None,
             id: None,
             point_type: None,
+            icon_svg_path: None,
+            icon_svg_dimensions: None,
+            text: None,
         }
     }
 }
