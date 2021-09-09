@@ -22,7 +22,7 @@ pub struct Style {
     pub id: Option<String>,
     pub point_type: Option<PointType>,
     pub icon_svg_path: Option<String>,
-    pub icon_svg_dimensions: Option<(i16, i16)>, //height, width
+    pub icon_svg_viewbox: Option<(i32, i32, i32, i32)>,
     pub text: Option<String>,
 }
 
@@ -40,7 +40,7 @@ impl Default for Style {
             id: None,
             point_type: None,
             icon_svg_path: None,
-            icon_svg_dimensions: None,
+            icon_svg_viewbox: None,
             text: None,
         }
     }

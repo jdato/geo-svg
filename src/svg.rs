@@ -51,9 +51,9 @@ impl<'a> Svg<'a> {
         self
     }
 
-    pub fn with_icon_svg_path(mut self, path: &str, height: i16, width: i16) -> Self {
+    pub fn with_icon_svg_path(mut self, path: &str, view_box: (i32, i32, i32, i32)) -> Self {
         self.style.icon_svg_path = Some(path.into());
-        self.style.icon_svg_dimensions = Some((height, width));
+        self.style.icon_svg_viewbox = Some(view_box);
         self
     }
     

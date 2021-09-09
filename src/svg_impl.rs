@@ -27,16 +27,27 @@ impl<T: CoordNum> ToSvgStr for Point<T> {
                 style = style,
             ),
             PointType::Poi => {
-                let (height, width) = style.icon_svg_dimensions.unwrap_or((0,0));
-                
+                let (min_x, min_y, width, height) = style.icon_svg_viewbox.unwrap_or((0,0,100,100));
+                let (x, y) = (format!("{:?}", self.x()).parse::<f64>().unwrap_or(0.0),
+                format!("{:?}", self.y()).parse::<f64>().unwrap_or(0.0));
+                let text = style.text.clone().and_then(|text| 
+                Some(format!(r#"<text x="{x:?}" y="{y:?}">{text}</text>"#,
+                x = (x + 100.0),
+                y = (y + 40.0),
+                text = text))
+                ).unwrap_or("".into());
+
                 format!(
-                    r#"<svg x="{x:?}" y="{y:?}" width="{w}" height="{h}" viewBox="0 0 22 20" {style}>{path}</svg>"#,
+                    r#"<svg x="{x:?}" y="{y:?}" width="140" height="140" viewBox="{mx} {my} {w} {h}" {style}>{path}</svg>{text}"#,
                     style = style,
                     path = style.icon_svg_path.clone().unwrap_or("".into()),
+                    mx = min_x,
+                    my = min_y,
                     w = width,
                     h = height,
-                    x = self.x(),
-                    y = self.y(),
+                    x = x - (140 as f64 / 2.0),
+                    y = y - (140 as f64 / 2.0),
+                    text = text,
                 )
             }
             PointType::Symbol |
