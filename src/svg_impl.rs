@@ -116,7 +116,22 @@ impl<T: CoordNum> ToSvgStr for Line<T> {
 
 impl<T: CoordNum> ToSvgStr for LineString<T> {
     fn to_svg_str(&self, style: &Style) -> String {
-        self.lines().map(|line| line.to_svg_str(style)).collect()
+
+        let d = self.lines().map(|line| {
+            format!(
+                "M {x1:?} {y1:?} L {x2:?}  {y2:?}",
+                x1 = line.start.x,
+                y1 = line.start.y,
+                x2 = line.end.x,
+                y2 = line.end.y,
+            )
+        }).reduce(|a, b| format!("{} {}", a, b)).unwrap_or("".into());
+
+        format!(
+            r#"<path d="{d}"{style}/>"#,
+            d = d,
+            style = style,
+        )
     }
 
     fn viewbox(&self, style: &Style) -> ViewBox {
