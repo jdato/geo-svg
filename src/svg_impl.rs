@@ -127,10 +127,20 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
             )
         }).reduce(|a, b| format!("{} {}", a, b)).unwrap_or("".into());
 
+        let text_part = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
+            format!(
+                r##"<text class="transportation_name_text"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
+                path_ref = id,
+                text = text,
+                start_offset = style.text_start_offset.and_then(|o| Some(format!(r#"startOffset="{}""#, o))).unwrap_or("".into()),
+            )
+        } else { "".into() };
+
         format!(
-            r#"<path d="{d}"{style}/>"#,
+            r#"<path d="{d}"{style}/>{txt}"#,
             d = d,
             style = style,
+            txt = text_part,
         )
     }
 
