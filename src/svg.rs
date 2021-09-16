@@ -46,9 +46,10 @@ impl<'a> Svg<'a> {
         self
     }
     
-    pub fn with_text(mut self, text: Option<String>, start_offset: Option<f64>) -> Self {
+    pub fn with_text(mut self, text: Option<String>, start_offset: Option<f64>, text_rotation_info: Option<bool>) -> Self {
         self.style.text = text.clone();
         self.style.text_start_offset = start_offset.clone();
+        self.style.text_rotation = text_rotation_info.clone();
         self
     }
 

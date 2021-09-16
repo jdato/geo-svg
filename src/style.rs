@@ -25,6 +25,7 @@ pub struct Style {
     pub icon_svg_viewbox: Option<(i32, i32, i32, i32)>,
     pub text: Option<String>,
     pub text_start_offset: Option<f64>,
+    pub text_rotation: Option<bool>,
 }
 
 impl Default for Style {
@@ -44,6 +45,7 @@ impl Default for Style {
             icon_svg_viewbox: None,
             text: None,
             text_start_offset: None,
+            text_rotation: None,
         }
     }
 }
