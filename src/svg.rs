@@ -1,4 +1,4 @@
-use crate::{Color, PointType, Style, ToSvgStr, ViewBox};
+use crate::{Color, PointType, Style, ToSvgStr, Transform, ViewBox};
 use std::fmt::{Display, Formatter, Result};
 
 #[derive(Clone)]
@@ -45,11 +45,11 @@ impl<'a> Svg<'a> {
         }
         self
     }
-    
-    pub fn with_text(mut self, text: Option<String>, start_offset: Option<f64>, text_rotation_info: Option<bool>) -> Self {
+
+    pub fn with_text(mut self, text: Option<String>, start_offset: Option<f64>, transform: Option<Transform>) -> Self {
         self.style.text = text.clone();
         self.style.text_start_offset = start_offset.clone();
-        self.style.text_rotation = text_rotation_info.clone();
+        self.style.transform = transform.clone();
         self
     }
 
@@ -58,12 +58,12 @@ impl<'a> Svg<'a> {
         self.style.icon_svg_viewbox = Some(view_box);
         self
     }
-    
+
     pub fn with_point_type(mut self, point_type: Option<PointType>) -> Self {
         self.style.point_type = point_type;
         self
     }
-    
+
     pub fn with_id(mut self, id: String) -> Self {
         self.style.id = Some(id.clone());
         for sibling in &mut self.siblings {

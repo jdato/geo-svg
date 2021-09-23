@@ -30,7 +30,7 @@ impl<T: CoordNum> ToSvgStr for Point<T> {
                 let (min_x, min_y, width, height) = style.icon_svg_viewbox.unwrap_or((0,0,100,100));
                 let (x, y) = (format!("{:?}", self.x()).parse::<f64>().unwrap_or(0.0),
                 format!("{:?}", self.y()).parse::<f64>().unwrap_or(0.0));
-                let text = style.text.clone().and_then(|text| 
+                let text = style.text.clone().and_then(|text|
                 Some(format!(r#"<text x="{x:?}" y="{y:?}">{text}</text>"#,
                 x = (x + 100.0),
                 y = (y + 40.0),
@@ -128,14 +128,12 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
         }).reduce(|a, b| format!("{} {}", a, b)).unwrap_or("".into());
 
         let text_part = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
-            let rotate = style.text_rotation.unwrap_or(false);
-            
+
             format!(
-                r##"<text class="transportation_name_text"{rotation_info}><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
+                r##"<text class="transportation_name_text"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
                 path_ref = id,
-                text = if rotate { text.chars().rev().collect::<String>() } else { text },
+                text = text,
                 start_offset = style.text_start_offset.and_then(|o| Some(format!(r#"startOffset="{}""#, o))).unwrap_or("".into()),
-                rotation_info = if rotate { r#" rotate="180""# } else { "" }
             )
         } else { "".into() };
 

@@ -10,6 +10,67 @@ pub enum PointType {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+pub struct Transform {
+    transform_functions: Vec<TransformFn>,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum TransformFn {
+    Matrix(f64, f64, f64, f64, f64, f64),
+    Translate(f64, Option<f64>),
+    Scale(f64, Option<f64>),
+    Rotate(f64, Option<(f64, f64)>),
+    SkewX(f64),
+    SkewY(f64),
+}
+
+impl Transform {
+    pub fn new(transform_functions: Vec<TransformFn>) -> Self {
+        Self {
+            transform_functions
+        }
+    }
+}
+
+impl Display for Transform {
+    fn fmt(&self, fmt: &mut Formatter<'_>) -> Result {
+        let transform_fns = self.transform_functions.iter().fold("".to_string(), |mut acc, f| {
+            acc.push_str(&f.to_string());
+            acc
+        });
+        write!(fmt, "{}", &transform_fns)
+    }
+}
+
+impl Display for TransformFn {
+    fn fmt(&self, fmt: &mut Formatter<'_>) -> Result {
+        match self {
+            TransformFn::Matrix(a, b, c, d, e, f) =>
+                write!(fmt, "matrix({}, {}, {}, {}, {}, {})", a, b, c, d, e, f),
+
+            TransformFn::Translate(x, y) => match y {
+                Some(y) => write!(fmt, "translate({}, {})", x, y),
+                None => write!(fmt, "translate({})", x),
+            },
+
+            TransformFn::Scale(x, y) => match y {
+                Some(y) => write!(fmt, "scale({}, {})", x, y),
+                None => write!(fmt, "scale({})", x),
+            },
+
+            TransformFn::Rotate(r, p) => match p {
+                Some((x, y)) => write!(fmt, "rotate({}, {}, {})", r, x, y),
+                None => write!(fmt, "rotate({})", r),
+            },
+
+            TransformFn::SkewX(a) => write!(fmt, "skewX({})", a),
+
+            TransformFn::SkewY(a) => write!(fmt, "skewY({})", a),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct Style {
     pub opacity: Option<f32>,
     pub fill: Option<Color>,
@@ -25,7 +86,7 @@ pub struct Style {
     pub icon_svg_viewbox: Option<(i32, i32, i32, i32)>,
     pub text: Option<String>,
     pub text_start_offset: Option<f64>,
-    pub text_rotation: Option<bool>,
+    pub transform: Option<Transform>,
 }
 
 impl Default for Style {
@@ -45,7 +106,7 @@ impl Default for Style {
             icon_svg_viewbox: None,
             text: None,
             text_start_offset: None,
-            text_rotation: None,
+            transform: None
         }
     }
 }
@@ -75,6 +136,9 @@ impl Display for Style {
         }
         if let Some(id) = self.id.clone() {
             write!(fmt, r#" id="{}""#, id)?;
+        }
+        if let Some(transform) = &self.transform {
+            write!(fmt, r#" transform="{}""#, transform)?;
         }
         Ok(())
     }
