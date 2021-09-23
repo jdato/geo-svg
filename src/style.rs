@@ -27,17 +27,20 @@ pub enum TransformFn {
 impl Transform {
     pub fn new(transform_functions: Vec<TransformFn>) -> Self {
         Self {
-            transform_functions
+            transform_functions,
         }
     }
 }
 
 impl Display for Transform {
     fn fmt(&self, fmt: &mut Formatter<'_>) -> Result {
-        let transform_fns = self.transform_functions.iter().fold("".to_string(), |mut acc, f| {
-            acc.push_str(&f.to_string());
-            acc
-        });
+        let transform_fns = self
+            .transform_functions
+            .iter()
+            .fold("".to_string(), |mut acc, f| {
+                acc.push_str(&f.to_string());
+                acc
+            });
         write!(fmt, "{}", &transform_fns)
     }
 }
@@ -45,8 +48,9 @@ impl Display for Transform {
 impl Display for TransformFn {
     fn fmt(&self, fmt: &mut Formatter<'_>) -> Result {
         match self {
-            TransformFn::Matrix(a, b, c, d, e, f) =>
-                write!(fmt, "matrix({}, {}, {}, {}, {}, {})", a, b, c, d, e, f),
+            TransformFn::Matrix(a, b, c, d, e, f) => {
+                write!(fmt, "matrix({}, {}, {}, {}, {}, {})", a, b, c, d, e, f)
+            }
 
             TransformFn::Translate(x, y) => match y {
                 Some(y) => write!(fmt, "translate({}, {})", x, y),
@@ -106,7 +110,7 @@ impl Default for Style {
             icon_svg_viewbox: None,
             text: None,
             text_start_offset: None,
-            transform: None
+            transform: None,
         }
     }
 }
