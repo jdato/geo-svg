@@ -132,28 +132,33 @@ impl<T: CoordNum> ToSvgStr for Line<T> {
 
 impl<T: CoordNum> ToSvgStr for LineString<T> {
     fn to_svg_str(&self, style: &Style) -> String {
-
-        let d = self.lines().map(|line| {
-            format!(
-                "M {x1:?} {y1:?} L {x2:?}  {y2:?}",
-                x1 = line.start.x,
-                y1 = line.start.y,
-                x2 = line.end.x,
-                y2 = line.end.y,
-            )
-        }).reduce(|a, b| format!("{} {}", a, b)).unwrap_or("".into());
+        let d = self
+            .lines()
+            .map(|line| {
+                format!(
+                    "M {x1:?} {y1:?} L {x2:?}  {y2:?}",
+                    x1 = line.start.x,
+                    y1 = line.start.y,
+                    x2 = line.end.x,
+                    y2 = line.end.y,
+                )
+            })
+            .reduce(|a, b| format!("{} {}", a, b))
+            .unwrap_or("".into());
 
         let text_part = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
-            let rotate = style.text_rotation.unwrap_or(false);
-            
             format!(
-                r##"<text class="transportation_name_text"{rotation_info}><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
+                r##"<text class="transportation_name_text"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
                 path_ref = id,
-                text = if rotate { text.chars().rev().collect::<String>() } else { text },
-                start_offset = style.text_start_offset.and_then(|o| Some(format!(r#"startOffset="{}""#, o))).unwrap_or("".into()),
-                rotation_info = if rotate { r#" rotate="180""# } else { "" }
+                text = text,
+                start_offset = style
+                    .text_start_offset
+                    .and_then(|o| Some(format!(r#"startOffset="{}""#, o)))
+                    .unwrap_or("".into()),
             )
-        } else { "".into() };
+        } else {
+            "".into()
+        };
 
         format!(
             r#"<path d="{d}"{style}/>{txt}"#,
