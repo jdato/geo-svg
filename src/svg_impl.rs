@@ -27,26 +27,42 @@ impl<T: CoordNum> ToSvgStr for Point<T> {
                 style = style,
             ),
             PointType::Poi => {
-                let (min_x, min_y, width, height) = style.icon_svg_viewbox.unwrap_or((0,0,100,100));
+                let (min_x, min_y, vb_width, vb_height) = style.icon_svg_viewbox.unwrap_or((0,0,100,100));
+                let (width, height) = style.icon_svg_width_height.unwrap_or((60,60));
                 let (x, y) = (format!("{:?}", self.x()).parse::<f64>().unwrap_or(0.0),
                 format!("{:?}", self.y()).parse::<f64>().unwrap_or(0.0));
+
+                #[allow(unused_assignments, unused_mut)]
+                let mut dbg_cir = "".to_string();
+                
+                // dbg_cir = format!(r#"<circle cx="{x:?}" cy="{y:?}" r=10></circle>"#,
+                //     x = x,
+                //     y = y
+                // );
+
                 let text = style.text.clone().and_then(|text| 
-                Some(format!(r#"<text x="{x:?}" y="{y:?}">{text}</text>"#,
-                x = (x + 100.0),
-                y = (y + 40.0),
-                text = text))
+                    Some(
+                        format!(r#"<text x="{x:?}" y="{y:?}">{text}</text>{debug_circle}"#,
+                            debug_circle = dbg_cir,
+                            x = (x + width as f64 / 2.0 + 15.0),
+                            y = (y + height as f64 - 45.0),
+                            text = text,
+                        )
+                    )
                 ).unwrap_or("".into());
 
                 format!(
-                    r#"<svg x="{x:?}" y="{y:?}" width="140" height="140" viewBox="{mx} {my} {w} {h}" {style}>{path}</svg>{text}"#,
+                    r#"<svg x="{x:?}" y="{y:?}" width="{w}" height="{h}" viewBox="{mx} {my} {vbw} {vbh}" {style}>{path}</svg>{text}"#,
                     style = style,
                     path = style.icon_svg_path.clone().unwrap_or("".into()),
-                    mx = min_x,
-                    my = min_y,
                     w = width,
                     h = height,
-                    x = x - (140 as f64 / 2.0),
-                    y = y - (140 as f64 / 2.0),
+                    mx = min_x,
+                    my = min_y,
+                    vbw = vb_width,
+                    vbh = vb_height,
+                    x = x - (width as f64 / 2.0),
+                    y = y - (height as f64 / 2.0),
                     text = text,
                 )
             }
