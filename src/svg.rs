@@ -50,11 +50,14 @@ impl<'a> Svg<'a> {
         mut self,
         text: Option<String>,
         start_offset: Option<f64>,
-        transform: Option<Transform>,
     ) -> Self {
         self.style.text = text.clone();
         self.style.text_start_offset = start_offset.clone();
-        self.style.transform = transform.clone();
+        self
+    }
+
+    pub fn with_transform(mut self, transform: Transform) -> Self {
+        self.style.transform = Some(transform);
         self
     }
 
