@@ -4,6 +4,7 @@ use geo_types::{
     MultiPoint, MultiPolygon, Point, Polygon, Rect, Triangle,
 };
 use num_traits::NumCast;
+use itertools::Itertools;
 
 impl<T: CoordNum> ToSvgStr for Coordinate<T> {
     fn to_svg_str(&self, style: &Style) -> String {
@@ -132,21 +133,28 @@ impl<T: CoordNum> ToSvgStr for Line<T> {
 
 impl<T: CoordNum> ToSvgStr for LineString<T> {
     fn to_svg_str(&self, style: &Style) -> String {
-        let d = self
-            .lines()
-            .map(|line| {
-                format!(
-                    "M {x1:?} {y1:?} L {x2:?}  {y2:?}",
-                    x1 = line.start.x,
-                    y1 = line.start.y,
-                    x2 = line.end.x,
-                    y2 = line.end.y,
-                )
-            })
-            .reduce(|a, b| format!("{} {}", a, b))
-            .unwrap_or("".into());
+        //
+        let points = self.lines()
+        .flat_map(|l| vec!(l.start, l.end))
+        .dedup();
+        
+        let path_el_vec = points
+            .fold(Vec::new(), |mut acc, coord|
+                if let (Some(x), Some(y)) = (<f64 as NumCast>::from(coord.x), <f64 as NumCast>::from(coord.y)) {
+                    acc.push((x, y).into());
+                    acc
+                } else {
+                    panic!("Couldn't convert T to f64");
+                }
+            );
 
-        let text_part = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
+        if style.id == Some("18022139183735021769".into()) {
+            println!("{:?}", path_el_vec);
+        }
+
+        let bezier_path = crate::bezier::svg_path(path_el_vec);
+
+        let path_text = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
             format!(
                 r##"<text class="transportation_name_text"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
                 path_ref = id,
@@ -162,9 +170,9 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
 
         format!(
             r#"<path d="{d}"{style}/>{txt}"#,
-            d = d,
+            d = bezier_path,
             style = style,
-            txt = text_part,
+            txt = path_text,
         )
     }
 

@@ -47,6 +47,7 @@
 //! [`ToSvg`]: svg/trait.ToSvg.html
 //! [`to_svg`]: svg/trait.ToSvg.html#method.to_svg
 
+mod bezier;
 mod color;
 mod style;
 mod svg;
