@@ -1,7 +1,5 @@
-use std::{f32::consts::PI, thread::current};
-
+use std::f32::consts::PI;
 use geo_types::Point;
-use rug::ops::Pow;
 
 #[derive(Debug)]
 struct LA {
@@ -17,7 +15,7 @@ fn line(point_a: Point<f64>,  point_b: Point<f64>) -> LA {
     let l_y = point_b.y() - point_a.y();
 
     LA {
-        length: l_x.pow(2).sqrt() + l_y.pow(2),
+        length: l_x.powf(2.).sqrt() + l_y.powf(2.),
         angle: l_y.atan2(l_x)
     }
 }

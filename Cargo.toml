@@ -14,4 +14,3 @@ categories = ["development-tools::debugging", "graphics", "multimedia::images", 
 geo-types = "0.7"
 num-traits = "0.2"
 itertools = "0.10"
-rug = ""
