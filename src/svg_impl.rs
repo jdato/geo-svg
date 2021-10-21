@@ -148,11 +148,13 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
                 }
             );
 
-        if style.id == Some("18022139183735021769".into()) {
+        let id = "9311654221325191496";
+
+        if style.id == Some(id.into()) {
             println!("{:?}", path_el_vec);
         }
 
-        let bezier_path = crate::bezier::svg_path(path_el_vec);
+        let bezier_path = crate::line_utils::path_has_min_angle(path_el_vec, 100, style.id == Some(id.into()));
 
         let path_text = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
             format!(
@@ -168,12 +170,16 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
             "".into()
         };
 
-        format!(
-            r#"<path d="{d}"{style}/>{txt}"#,
-            d = bezier_path,
-            style = style,
-            txt = path_text,
-        )
+        if style.css_classes.clone().unwrap_or("".into()).contains("transportation_name") && bezier_path.1 {
+            "".to_string()
+        } else {
+            format!(
+                r#"<path d="{d}"{style}/>{txt}"#,
+                d = bezier_path.0,
+                style = style,
+                txt = path_text,
+            )
+        }
     }
 
     fn viewbox(&self, style: &Style) -> ViewBox {
