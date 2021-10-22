@@ -20,7 +20,8 @@ impl<T: CoordNum> ToSvgStr for Point<T> {
         if let Some(point_type) = style.point_type.clone() {
             match point_type {
             PointType::Text => format!(
-                r#"<text x="{x:?}" y="{y:?}" {style}>{text}</text>"#,
+                r#"<text class="{}" x="{x:?}" y="{y:?}" {style}>{text}</text>"#,
+                class = style.text_classes.clone().unwrap_or("".into()),
                 x = self.x(),
                 y = self.y(),
                 text = style.text.clone().unwrap_or("".into()),
