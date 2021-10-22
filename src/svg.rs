@@ -50,9 +50,11 @@ impl<'a> Svg<'a> {
         mut self,
         text: Option<String>,
         start_offset: Option<f64>,
+        text_classes: Option<String>,
     ) -> Self {
         self.style.text = text.clone();
         self.style.text_start_offset = start_offset.clone();
+        self.style.text_classes = text_classes.clone();
         self
     }
 

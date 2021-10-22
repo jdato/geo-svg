@@ -91,6 +91,7 @@ pub struct Style {
     pub icon_svg_width_height: Option<(i32, i32)>,
     pub text: Option<String>,
     pub text_start_offset: Option<f64>,
+    pub text_classes: Option<String>,
     pub transform: Option<Transform>,
 }
 
@@ -112,6 +113,7 @@ impl Default for Style {
             icon_svg_width_height: None,
             text: None,
             text_start_offset: None,
+            text_classes: None,
             transform: None,
         }
     }

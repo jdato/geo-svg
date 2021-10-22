@@ -34,13 +34,13 @@ impl<T: CoordNum> ToSvgStr for Point<T> {
 
                 #[allow(unused_assignments, unused_mut)]
                 let mut dbg_cir = "".to_string();
-                
+
                 // dbg_cir = format!(r#"<circle cx="{x:?}" cy="{y:?}" r=10></circle>"#,
                 //     x = x,
                 //     y = y
                 // );
 
-                let text = style.text.clone().and_then(|text| 
+                let text = style.text.clone().and_then(|text|
                     Some(
                         format!(r#"<text x="{x:?}" y="{y:?}">{text}</text>{debug_circle}"#,
                             debug_circle = dbg_cir,
@@ -148,7 +148,8 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
 
         let text_part = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
             format!(
-                r##"<text class="transportation_name_text"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
+                r##"<text class="{class}"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
+                class = style.text_classes.as_ref().unwrap_or(&"".into()),
                 path_ref = id,
                 text = text,
                 start_offset = style
