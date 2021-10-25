@@ -20,7 +20,8 @@ impl<T: CoordNum> ToSvgStr for Point<T> {
         if let Some(point_type) = style.point_type.clone() {
             match point_type {
             PointType::Text => format!(
-                r#"<text x="{x:?}" y="{y:?}" {style}>{text}</text>"#,
+                r#"<text class="{}" x="{x:?}" y="{y:?}" {style}>{text}</text>"#,
+                class = style.text_classes.clone().unwrap_or("".into()),
                 x = self.x(),
                 y = self.y(),
                 text = style.text.clone().unwrap_or("".into()),
@@ -148,7 +149,8 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
 
         let text_part = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
             format!(
-                r##"<text class="transportation_name_text"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
+                r##"<text class="{class}"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
+                class = style.text_classes.as_ref().unwrap_or(&"".into()),
                 path_ref = id,
                 text = text,
                 start_offset = style
