@@ -48,6 +48,7 @@
 //! [`to_svg`]: svg/trait.ToSvg.html#method.to_svg
 
 mod color;
+mod line_utils;
 mod style;
 mod svg;
 mod svg_impl;

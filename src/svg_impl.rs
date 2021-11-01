@@ -113,7 +113,7 @@ impl<T: CoordNum> ToSvgStr for MultiPoint<T> {
 impl<T: CoordNum> ToSvgStr for Line<T> {
     fn to_svg_str(&self, style: &Style) -> String {
         format!(
-            r#"<path d="M {x1:?} {y1:?} L {x2:?} {y2:?}"{style}/>"#,
+            r#"<path d="M{x1:?},{y1:?}L{x2:?},{y2:?}"{style}/>"#,
             x1 = self.start.x,
             y1 = self.start.y,
             x2 = self.end.x,
@@ -133,19 +133,48 @@ impl<T: CoordNum> ToSvgStr for Line<T> {
 
 impl<T: CoordNum> ToSvgStr for LineString<T> {
     fn to_svg_str(&self, style: &Style) -> String {
-        let d = self
-            .lines()
-            .map(|line| {
-                format!(
-                    "M {x1:?} {y1:?} L {x2:?}  {y2:?}",
-                    x1 = line.start.x,
-                    y1 = line.start.y,
-                    x2 = line.end.x,
-                    y2 = line.end.y,
-                )
-            })
-            .reduce(|a, b| format!("{} {}", a, b))
-            .unwrap_or("".into());
+        //
+        use itertools::Itertools;
+
+        let points = self.lines()
+        .flat_map(|l| vec!(l.start, l.end))
+        .dedup();
+        
+        let path_el_vec = points
+            .fold(Vec::new(), |mut acc, coord|
+                if let (Some(x), Some(y)) = (<f64 as NumCast>::from(coord.x), <f64 as NumCast>::from(coord.y)) {
+                    acc.push((x, y).into());
+                    acc
+                } else {
+                    panic!("Couldn't convert T to f64");
+                }
+            );
+
+        // let d = self
+        //     .lines()
+        //     .map(|line| {
+        //         format!(
+        //             "M {x1:?} {y1:?} L {x2:?}  {y2:?}",
+        //             x1 = line.start.x,
+        //             y1 = line.start.y,
+        //             x2 = line.end.x,
+        //             y2 = line.end.y,
+        //         )
+        //     })
+        //     .reduce(|a, b| format!("{} {}", a, b))
+        //     .unwrap_or("".into());
+
+        let debug_id = "";// "12066225358543663289";
+        
+        let d_angle = crate::line_utils::path_has_min_angle(path_el_vec, 120, style.id == Some(debug_id.into()));
+        
+        let rem = 
+        "";
+        // if d_angle.1 {
+        //     r#"style="stroke: red;""#
+        // } else { "" };
+
+        // println!("~ ~ ~ ~ ~ ~ ~ ~\nold: {:?}\nnew: {:?}\n~ ~ ~ ~ ~ ~ ~ ~", d, d_angle);
 
         let text_part = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
             format!(
@@ -162,12 +191,19 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
             "".into()
         };
 
-        format!(
-            r#"<path d="{d}"{style}/>{txt}"#,
-            d = d,
-            style = style,
-            txt = text_part,
-        )
+        // If path is a transportation name and the angle is smaller than min angle
+        if style.css_classes.clone().unwrap_or("".into()).contains("transportation_name") && d_angle.1 {
+            // println!("LEFTOUT {:?}, details: {:?}", style.text.clone(), d_angle);
+            "".to_string()
+        } else {
+            format!(
+                r#"<path d="{d}"{style}{rem}/>{txt}"#,
+                d = d_angle.0,
+                style = style,
+                txt = text_part,
+                rem = rem,
+            )
+        }
     }
 
     fn viewbox(&self, style: &Style) -> ViewBox {
@@ -201,12 +237,12 @@ impl<T: CoordNum> ToSvgStr for Polygon<T> {
         for contour in std::iter::once(self.exterior()).chain(self.interiors().iter()) {
             let mut points = contour.points_iter();
             if let Some(first_point) = points.next() {
-                write!(path, "M {:?} {:?}", first_point.x(), first_point.y()).unwrap()
+                write!(path, "M{:?},{:?}", first_point.x(), first_point.y()).unwrap()
             }
             for point in points {
-                write!(path, " L {:?} {:?}", point.x(), point.y()).unwrap();
+                write!(path, "L{:?},{:?}", point.x(), point.y()).unwrap();
             }
-            write!(path, " Z ").unwrap();
+            write!(path, "Z").unwrap();
         }
 
         format!(
