@@ -159,7 +159,7 @@ impl<T: CoordNum> ToSvgStr for LineString<T> {
 
         let path_text = if let (Some(text), Some(id)) = (style.text.clone(), style.id.clone()) {
             format!(
-                r##"<text class="{class}"><textPath xlink:href="#{path_ref}"{start_offset}>{text}<textPath/></text>"##,
+                r##"<text class="{class}"><textPath href="#{path_ref}" {start_offset}>{text}</textPath></text>"##,
                 class = style.text_classes.as_ref().unwrap_or(&"".into()),
                 path_ref = id,
                 text = text,
